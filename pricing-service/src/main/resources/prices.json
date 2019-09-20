@@ -1,0 +1,68 @@
+[
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "1",
+    "currency": "inr",
+    "price":"9999999"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "2",
+    "currency": "inr",
+    "price":"22222222"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "3",
+    "currency": "inr",
+    "price":"222223333333"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "4",
+    "currency": "inr",
+    "price":"4444444"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "5",
+    "currency": "inr",
+    "price":"55555555"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "6",
+    "currency": "inr",
+    "price":"6565656565"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "7",
+    "currency": "inr",
+    "price":"77777777"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "8",
+    "currency": "inr",
+    "price":"9999889"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "9",
+    "currency": "inr",
+    "price":"9999999"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "10",
+    "currency": "inr",
+    "price":"1010101010"
+  },
+  {
+    "_class": "com.udacity.pricing.entity.Price",
+    "vehicleId" : "11",
+    "currency": "inr",
+    "price":"111111111"
+  }
+]
