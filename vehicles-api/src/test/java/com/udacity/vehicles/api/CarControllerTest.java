@@ -1,5 +1,15 @@
 package com.udacity.vehicles.api;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,6 +23,9 @@ import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.Details;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.service.CarService;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,20 +40,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Implements testing of the CarController class.
@@ -80,6 +79,7 @@ public class CarControllerTest {
 
     /**
      * Tests for successful creation of new car in the system
+     *
      * @throws Exception when car creation fails in the system
      */
     @Test
@@ -95,15 +95,11 @@ public class CarControllerTest {
 
     /**
      * Tests if the read operation appropriately returns a list of vehicles.
+     *
      * @throws Exception if the read operation of the vehicle list fails
      */
     @Test
     public void listCars() throws Exception {
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   the whole list of vehicles. This should utilize the car from `getCar()`
-         *   below (the vehicle will be the first in the list).
-         */
 
         MvcResult result = mvc.perform(get(new URI("/cars")))
                 .andExpect(status().isOk())
@@ -112,100 +108,119 @@ public class CarControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        ObjectNode results = mapper.readValue(result.getResponse().getContentAsByteArray(), ObjectNode.class);
-        JsonNode rootNode = mapper.readTree( result.getResponse().getContentAsString());
+        JsonNode rootNode = mapper.readTree(result.getResponse().getContentAsString());
         JsonNode list = rootNode.findPath("carList");
-        List<Car> actual = mapper.readValue(list.toString(), new TypeReference<List<Car>>() {});
+        List<Car> actual = mapper.readValue(list.toString(), new TypeReference<List<Car>>() {
+        });
         Car car = actual.get(0);
-         assertThat(car.getDetails(), allOf(hasProperty("model",          is(getCar().getDetails().getModel())),
-                hasProperty("mileage",        is(getCar().getDetails().getMileage())),
-                hasProperty("body", is(getCar().getDetails().getBody())),
-                hasProperty("engine",is(getCar().getDetails().getEngine())),
-                hasProperty("externalColor",is(getCar().getDetails().getExternalColor())),
-                hasProperty("fuelType",is(getCar().getDetails().getFuelType())),
-                hasProperty("modelYear",is(getCar().getDetails().getModelYear())),
-                hasProperty("productionYear",is(getCar().getDetails().getProductionYear())),
-                hasProperty("numberOfDoors",is(getCar().getDetails().getNumberOfDoors()))));
+        assertThat(car.getDetails(),
+                allOf(hasProperty("model", is(getCar().getDetails().getModel())),
+                        hasProperty("mileage", is(getCar().getDetails().getMileage())),
+                        hasProperty("body", is(getCar().getDetails().getBody())),
+                        hasProperty("engine", is(getCar().getDetails().getEngine())),
+                        hasProperty("externalColor", is(getCar().getDetails().getExternalColor())),
+                        hasProperty("fuelType", is(getCar().getDetails().getFuelType())),
+                        hasProperty("modelYear", is(getCar().getDetails().getModelYear())),
+                        hasProperty("productionYear",
+                                is(getCar().getDetails().getProductionYear())),
+                        hasProperty("numberOfDoors",
+                                is(getCar().getDetails().getNumberOfDoors()))));
 
-        assertThat(car.getCondition(),is(getCar().getCondition()));
-        assertThat(car.getLocation(),allOf(hasProperty("lat",is(getCar().getLocation().getLat())),hasProperty("lon",
-                is(getCar().getLocation().getLon()))));
-        assertThat(car.getDetails().getManufacturer(),allOf(hasProperty("code",is(getCar().getDetails().getManufacturer().getCode())),
-                hasProperty("name",is(getCar().getDetails().getManufacturer().getName()))));
-     }
-
-
-
+        assertThat(car.getCondition(), is(getCar().getCondition()));
+        assertThat(car.getLocation(),
+                allOf(hasProperty("lat", is(getCar().getLocation().getLat())), hasProperty("lon",
+                        is(getCar().getLocation().getLon()))));
+        assertThat(car.getDetails().getManufacturer(),
+                allOf(hasProperty("code", is(getCar().getDetails().getManufacturer().getCode())),
+                        hasProperty("name",
+                                is(getCar().getDetails().getManufacturer().getName()))));
+    }
 
 
     /**
      * Tests the read operation for a single car by ID.
+     *
      * @throws Exception if the read operation for a single car fails
      */
     @Test
     public void findCar() throws Exception {
-        /**
-         * TODO: Add a test to check that the `get` method works by calling
-         *   a vehicle by ID. This should utilize the car from `getCar()` below.
-         */
 
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/cars/{id}","1"))
+        MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/cars/{id}", "1"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         ObjectMapper mapper = new ObjectMapper();
         Car car = mapper.readValue(result.getResponse().getContentAsString(), Car.class);
 
-        assertThat(car.getDetails(), allOf(hasProperty("model",          is(getCar().getDetails().getModel())),
-                hasProperty("mileage",        is(getCar().getDetails().getMileage())),
-                hasProperty("body", is(getCar().getDetails().getBody())),
-                hasProperty("engine",is(getCar().getDetails().getEngine())),
-                hasProperty("externalColor",is(getCar().getDetails().getExternalColor())),
-                hasProperty("fuelType",is(getCar().getDetails().getFuelType())),
-                hasProperty("modelYear",is(getCar().getDetails().getModelYear())),
-                hasProperty("productionYear",is(getCar().getDetails().getProductionYear())),
-                hasProperty("numberOfDoors",is(getCar().getDetails().getNumberOfDoors()))));
+        assertThat(car.getDetails(),
+                allOf(hasProperty("model", is(getCar().getDetails().getModel())),
+                        hasProperty("mileage", is(getCar().getDetails().getMileage())),
+                        hasProperty("body", is(getCar().getDetails().getBody())),
+                        hasProperty("engine", is(getCar().getDetails().getEngine())),
+                        hasProperty("externalColor", is(getCar().getDetails().getExternalColor())),
+                        hasProperty("fuelType", is(getCar().getDetails().getFuelType())),
+                        hasProperty("modelYear", is(getCar().getDetails().getModelYear())),
+                        hasProperty("productionYear",
+                                is(getCar().getDetails().getProductionYear())),
+                        hasProperty("numberOfDoors",
+                                is(getCar().getDetails().getNumberOfDoors()))));
 
-        assertThat(car.getCondition(),is(getCar().getCondition()));
-        assertThat(car.getLocation(),allOf(hasProperty("lat",is(getCar().getLocation().getLat())),hasProperty("lon",
-                is(getCar().getLocation().getLon()))));
-        assertThat(car.getDetails().getManufacturer(),allOf(hasProperty("code",is(getCar().getDetails().getManufacturer().getCode())),
-                hasProperty("name",is(getCar().getDetails().getManufacturer().getName()))));
+        assertThat(car.getCondition(), is(getCar().getCondition()));
+        assertThat(car.getLocation(),
+                allOf(hasProperty("lat", is(getCar().getLocation().getLat())), hasProperty("lon",
+                        is(getCar().getLocation().getLon()))));
+        assertThat(car.getDetails().getManufacturer(),
+                allOf(hasProperty("code", is(getCar().getDetails().getManufacturer().getCode())),
+                        hasProperty("name",
+                                is(getCar().getDetails().getManufacturer().getName()))));
 
 
     }
 
     /**
      * Tests the deletion of a single car by ID.
+     *
      * @throws Exception if the delete operation of a vehicle fails
      */
     @Test
     public void deleteCar() throws Exception {
-        /**
-         * TODO: Add a test to check whether a vehicle is appropriately deleted
-         *   when the `delete` method is called from the Car Controller. This
-         *   should utilize the car from `getCar()` below.
-         */
+        Car car = getCar();
+        car.setId(2L);
+        given(carService.save(any())).willReturn(car);
+        given(carService.findById(any())).willReturn(car);
+        given(carService.list()).willReturn(Collections.singletonList(car));
 
-          Car car = getCar();
-          car.setId(2L);
-          given(carService.save(any())).willReturn(car);
-          given(carService.findById(any())).willReturn(car);
-          given(carService.list()).willReturn(Collections.singletonList(car));
-
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/cars/{id}","2"))
+        MvcResult result = mvc.perform(MockMvcRequestBuilders.get("/cars/{id}", "2"))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        MvcResult delResult = mvc.perform(MockMvcRequestBuilders.delete("/cars/{id}","2"))
+        MvcResult delResult = mvc.perform(MockMvcRequestBuilders.delete("/cars/{id}", "2"))
                 .andExpect(status().is(204))
                 .andReturn();
-        
+
     }
 
     /**
+     * Tests the update of a single car by ID.
+     *
+     * @throws Exception if the update operation of a vehicle fails
+     */
+    @Test
+    public void updateCar() throws Exception {
+        Car carToSave = getCar();
+        MvcResult result = mvc.perform(
+                MockMvcRequestBuilders.put("/cars/{id}", "1")
+                        .content(json.write(carToSave).getJson())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+
+    /**
      * Creates an example Car object for use in testing.
+     *
      * @return an example Car object
      */
     private Car getCar() {
